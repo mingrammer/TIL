@@ -1,2 +1,4 @@
-# til
-Today I Learned
+# TIL
+> Today I Learned
+
+A collection of learnings
