@@ -9,4 +9,4 @@
 
 주제는 주로 개발관련 내용일테지만 그 외의 것들도 간혹 올릴 수 있습니다.
 
-> I'm ready to learning always. learning up!
+> I'm ready to learn always. learning up!
