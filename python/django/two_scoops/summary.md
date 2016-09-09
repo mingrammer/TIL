@@ -132,14 +132,16 @@
 
 * 모델이 너무 많으면 앱을 나눈다.
 * 모델 상속
-    > 파이썬 표준 라이브러리의 abc에서의 추상화 기초 클래스와 장고에서의 추상화 기초 클래스는 서로 목적이 전혀 다르다.
 
-    | 모델의 상속 스타일 | 장점 | 단점 |
-    |---------------|-----|-----| 
-    | **상속 없음** : 모델들 사이에 공통 필드가 존재할 경우, 두 모델에 전부 해당 필드를 만들어 줌 | 테이블 매핑에 신경을 안써도되며, 간단함 | 모델간의 중복 테이블이 많을 경우 관리 어려움 |
-    | **추상화 기초 클래스** : 오직 상속받아 생성된 모델들의 테이블만 생성 | 공통 부분 재사용 가능. 추가 테이블 필요 없음. 조인으로 인한 성능 저하 없음. | 부모 클래스를 독립적으로 이용 못함 |
-    | **멀티테이블 상속** : 부모와 자식 모델에 대해서 모두 테이블이 생성됨. OneToOneField는 부모와 자식 간에 적용됨. | 각 모델에 대해 매칭되는 테이블이 생성됨. 따라서 부모 또는 자식 모델 어디로든지 쿼리 가능. 부모 객체로부터 자식 객체 호출 가능. | 자식 테이블에 대한 각 쿼리에 대해 부모 테이블로의 조인이 필요해 부하 발생. 권하지 않음 |
-    | **프록시 모델** : 원래 모델에 대해서만 테이블이 생성됨. | 각기 다른 파이썬 작용(behavior)을 하는 모델들의 별칭을 가질 수 있음 | 모델 필드 변경 불가 |
+> 파이썬 표준 라이브러리의 abc에서의 추상화 기초 클래스와 장고에서의 추상화 기초 클래스는 서로 목적이 전혀 다르다.
+
+| 모델의 상속 스타일 | 장점 | 단점 |
+|---------------|-----|-----| 
+| **상속 없음** : 모델들 사이에 공통 필드가 존재할 경우, 두 모델에 전부 해당 필드를 만들어 줌 | 테이블 매핑에 신경을 안써도되며, 간단함 | 모델간의 중복 테이블이 많을 경우 관리 어려움 |
+| **추상화 기초 클래스** : 오직 상속받아 생성된 모델들의 테이블만 생성 | 공통 부분 재사용 가능. 추가 테이블 필요 없음. 조인으로 인한 성능 저하 없음. | 부모 클래스를 독립적으로 이용 못함 |
+| **멀티테이블 상속** : 부모와 자식 모델에 대해서 모두 테이블이 생성됨. OneToOneField는 부모와 자식 간에 적용됨. | 각 모델에 대해 매칭되는 테이블이 생성됨. 따라서 부모 또는 자식 모델 어디로든지 쿼리 가능. 부모 객체로부터 자식 객체 호출 가능. | 자식 테이블에 대한 각 쿼리에 대해 부모 테이블로의 조인이 필요해 부하 발생. 권하지 않음 |
+| **프록시 모델** : 원래 모델에 대해서만 테이블이 생성됨. | 각기 다른 파이썬 작용(behavior)을 하는 모델들의 별칭을 가질 수 있음 | 모델 필드 변경 불가 |
+
 * DB 마이그레이션
     * 마이그레이션 생성 팁
         * 새로운 앱이나 모델이 생성되면 새 모델에 대해 makemigrations 실행
@@ -156,32 +158,35 @@
     * DB 정규화
     * 캐시의 비정규화 (성능 향상)
     * 반드시 필요한 경우에만 비정규화 수행
-    * null와 공백
-    | 필드 타입 | null=True | blank=True |
-    |---------|-----------|------------|
-    | CharField, TextField, SlugField, EmailField, CommaSeparatedIntegerField, UUIDField | X | O. 위젯이 빈 값을 허용하기를 원한다면 설정한다. |
-    | FileField, ImageField | X | O |
-    | BooleanField | X. 대신 NullBooleanField 이용 | X |
-    | IntegerField, FloatField, DecimalField, DurationField | 해당 값이 DB에 NULL로 들어가도 상관없다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 상관없다면 null=True와 같이 이용 |
-    | DateTimeField, DateField, TimeField | DB에서 해당 값들을 NULL로 설정하는게 가능하다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 문제가 없다거나 auto_now나 auto_now_add를 이용하고 있다면 null=True와 같이 이용 |
-    | ForeignKey, ManyToManyField, OneToOneField | DB에서 해당 값들을 NULL로 설정하는게 가능하다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 괜찮다면 이용 |
-    | GenericIPAddressField | DB에서 해당 값을 NULL로 설정하는게 가능하다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 괜찮다면 이용 |
-    | IPAddressField | X | X |  
-    * BinaryField 이용
-        * 메시지팩 형식의 콘텐츠
-        * 원본 센서 데이터
-        * 압축된 데이터. ex. 센트리(Sentry)가 블롭(BLOB)으로 저장했지만 레거시 이슈등으로 base64로 인코딩된 데이터들의 형식 
-        * 이를 이용하여 파일을 직접 서비스하지는 않는다. (성능 이슈)
-    * 범용 관계(generic relations)는 피하자.
-        * 모델 간의 인덱싱이 존재하지 않으면 쿼리 속도에 손해를 가져옴
-        * 다른 테이블에 존재하지 않는 레코드를 참조할 수 있는 데이터 충돌의 위험성이 존재
-    * PostgreSQL에만 존재하는 필드에 대한 null과 공백의 사용 여부
-    | 필드 타입 | null=True | blank=True |
-    |---------|-----------|------------|
-    | ArrayField | O | O |
-    | HStoreField | O | O |
-    | IntegerRangeField, BigIntegerField, FloatRangeField | DB에서 해당 값들을 NULL로 설정할 수 있다면 이용 가능 | 위젯에서 해당하는 폼이 빈 값을 허용하기를 원한다면 null=True와 함께 사용 |
-    | DatetimeRangeField, DateRangeField | DB에서 해당 값들을 NULL로 설정할 수 있다면 이용 가능 | 위젯에서 해당 값이 빈 값을 허용하기를 원할 경우 또는 auto_now나 auto_now_add를 이용하고 있다면 null=True와 같이 이용 |
+* null과 공백
+   
+| 필드 타입 | null=True | blank=True |
+|---------|-----------|------------|
+| CharField, TextField, SlugField, EmailField, CommaSeparatedIntegerField, UUIDField | X | O. 위젯이 빈 값을 허용하기를 원한다면 설정한다. |
+| FileField, ImageField | X | O |
+| BooleanField | X. 대신 NullBooleanField 이용 | X |
+| IntegerField, FloatField, DecimalField, DurationField | 해당 값이 DB에 NULL로 들어가도 상관없다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 상관없다면 null=True와 같이 이용 |
+| DateTimeField, DateField, TimeField | DB에서 해당 값들을 NULL로 설정하는게 가능하다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 문제가 없다거나 auto_now나 auto_now_add를 이용하고 있다면 null=True와 같이 이용 |
+| ForeignKey, ManyToManyField, OneToOneField | DB에서 해당 값들을 NULL로 설정하는게 가능하다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 괜찮다면 이용 |
+| GenericIPAddressField | DB에서 해당 값을 NULL로 설정하는게 가능하다면 이용 | 위젯에서 해당 값이 빈 값을 받아와도 괜찮다면 이용 |
+| IPAddressField | X | X |
+
+* BinaryField 이용
+    * 메시지팩 형식의 콘텐츠
+    * 원본 센서 데이터
+    * 압축된 데이터. ex. 센트리(Sentry)가 블롭(BLOB)으로 저장했지만 레거시 이슈등으로 base64로 인코딩된 데이터들의 형식 
+    * 이를 이용하여 파일을 직접 서비스하지는 않는다. (성능 이슈)
+* 범용 관계(generic relations)는 피하자.
+    * 모델 간의 인덱싱이 존재하지 않으면 쿼리 속도에 손해를 가져옴
+    * 다른 테이블에 존재하지 않는 레코드를 참조할 수 있는 데이터 충돌의 위험성이 존재
+* PostgreSQL에만 존재하는 필드에 대한 null과 공백의 사용 여부
+
+| 필드 타입 | null=True | blank=True |
+|---------|-----------|------------|
+| ArrayField | O | O |
+| HStoreField | O | O |
+| IntegerRangeField, BigIntegerField, FloatRangeField | DB에서 해당 값들을 NULL로 설정할 수 있다면 이용 가능 | 위젯에서 해당하는 폼이 빈 값을 허용하기를 원한다면 null=True와 함께 사용 |
+| DatetimeRangeField, DateRangeField | DB에서 해당 값들을 NULL로 설정할 수 있다면 이용 가능 | 위젯에서 해당 값이 빈 값을 허용하기를 원할 경우 또는 auto_now나 auto_now_add를 이용하고 있다면 null=True와 같이 이용 |
 * 모델의 _meta API
     * 사용 이유
         * 모델 필드의 리스트를 가져올 때
