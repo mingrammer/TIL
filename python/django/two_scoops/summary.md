@@ -55,7 +55,21 @@
     * 단점
         * 필요하지 않는 기능들까지 제공되어 복잡해짐. OS레벨에서 고려해야할 필요가 없는 경우, 안하는 편이 더 편리하다.
 
- 
+<br>
+
+## 3. 장고 프로젝트 구성
+
+```
+<repository_root>/
+    <django_project_root>/
+        <configuration_root>/
+```
+
+* **repository_root** : README.md, docs/, .gitignore, requirements.txt, 배포 관련 파일 등등
+* **django_project_root** : Django project 소스들
+* **configuration_root** : settings, uris.py 등등. (유효한 파이썬 패키지)
+* Django cookiecutter를 사용할 수도 있음.
+
 
 
 
