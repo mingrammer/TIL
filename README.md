@@ -1,7 +1,7 @@
 # wiki
 > My personal wiki
 
-> This wiki is published on gitbook [here](https://mingrammer.gitbooks.io/wiki/content)
+> This wiki is published on gitbook [here](https://wiki.mingrammer.com)
 
 <br>
 
