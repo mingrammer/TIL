@@ -1,5 +1,7 @@
-# TIL
-> Today I Learned
+# wiki
+> My personal wiki
+
+> This wiki is published on gitbook [here](https://mingrammer.gitbooks.io/wiki/content)
 
 -
 
