@@ -250,8 +250,7 @@
 | 데이터 가져오기 | .get(), .filter(), .count(), .iterate(), .exists(), .exclude(), .in_bulk() 등 |  |
 | 데이터 수정하기 | .update() | Yes |
 | 데이터 지우기 | .delete() | Yes |
-
-        * 독립적인 ORM 메서드 호출을 트랜잭션으로 처리하지 말자.
+* 독립적인 ORM 메서드 호출을 트랜잭션으로 처리하지 말자.
 * `django.http.StreamingHttpResponse`와 트랜잭션
     * 뷰가 `django.http.StreamingHttpResponse`를 반환한다면 응답이 시작된 이상 트랜잭션 에러를 중간에 처리하기란 불가능
     * `ATOMIC_REQUESTS`를 False로 설정 후, 명시적인 트랜잭션 선언을 고려
