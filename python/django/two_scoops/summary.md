@@ -26,9 +26,9 @@
 
 
   * 임포트 방식
-    * 절대 임포트 : from app.module import something
-    * 명시적 상대 : from .module import something
-    * 암묵적 상대 : from module import something
+    * **절대 임포트** : from app.module import something
+    * **명시적 상대** : from .module import something
+    * **암묵적 상대** : from module import something
     * 가급적 명시적 상대 임포트를 사용
 
   * Never use `import *`
@@ -75,10 +75,10 @@
 ## 4. 장고 앱 디자인의 기본
 
 * 장고 앱 용어    
-    * 장고 프로젝트 : 장고 웹 프레임워크를 기반으로 한 웹 애플리케이션
-    * 장고 앱 : 프로젝트의 한 기능을 표현하기 위해 디자인된 작은 라이브러리
-    * INSTALLED_APPS : 프로젝트에 이용하기 위해 INSTALLED_APPS 세팅에 설정한 장고 앱들
-    * 서드 파티 장고 패키지 : 파이썬 패키지 도구들에 의해 패키지화된, 재사용 가능한 플러그인 형태의 장고 앱
+    * **장고 프로젝트** : 장고 웹 프레임워크를 기반으로 한 웹 애플리케이션
+    * **장고 앱** : 프로젝트의 한 기능을 표현하기 위해 디자인된 작은 라이브러리
+    * **INSTALLED_APPS** : 프로젝트에 이용하기 위해 INSTALLED_APPS 세팅에 설정한 장고 앱들
+    * **서드 파티 장고 패키지** : 파이썬 패키지 도구들에 의해 패키지화된, 재사용 가능한 플러그인 형태의 장고 앱
 * 각 앱은 그 앱의 주어진 임무에만 집중할 수 있어야함
 * 앱 이름 정하기
     * 가능한 한 한 단어
@@ -211,4 +211,48 @@
         * **모델 행동 (믹스인)** : 모델 행동은 믹스인을 통한 캡슐화와 구성화의 개념으로 이루어짐. 모델은 추상화 모델로부터 로직들을 상속받음.
         * **상태 없는 헬퍼 함수** : 로직을 모델로부터 떼어내 독립적인 유틸리티 함수로 넣음. 유닛 테스트가 편해짐. 다만 stateless하기 때문에 더 많은 인자를 필요로 함
 
+<br>
+
+## 7. 쿼리와 데이터베이스 레이어
+
+* 단일 객체에서 `get_object_or_404()` 사용
+    * 단, 뷰에서만 이용
+* 쿼리 예외 처리
+    * ObjectDoesNotExist : 어떤 모델 객체에도 사용 가능 (`except ObjectDoesNotExist`)
+    * DoesNotExist : 특정 모델에서만 사용 가능 (`except ModelName.DoesNotExist`)
+    * MultipleObjectsReturned : 여러 개의 객체가 반환될 수 있는 경우 사용 (`except ModelName.MultipleObjectsReturned`)
+* 코드 가독성과 유지보수의 용이성을 위해 지연 연산 활용
+* 고급 쿼리 도구
+    * 데이터 처리를 언어 차원에서 하지않고 DB 내부에서 처리하게 함으로써 성능 향상을 얻을 수 있으며, 경합 상황(race condition)을 피할 수 있음
+    * DB 함수를 사용함으로써 성능 향상을 얻을 수 있음
+* Raw SQL은 지양
+    * Raw SQL을 직접 이용함으로써 파이썬 코드나 ORM을 통해 생성된 코드가 월등히 간결해지고 단축되는 경우에만 사용
+* 인덱스를 사용해야할 경우
+    * 인덱스가 빈번하게 (10~25%) 이용될 때
+    * 실제 데이터 또는 실제와 비슷한 데이터가 존재해서 인덱싱 결과에 대한 분석이 가능할 때
+    * 인덱싱을 통해 성능이 향상되는지 테스트할 수 있을 때
+* 트랜잭션
+    * 각각의 HTTP요청을 트랜잭션으로 처리
+        * `'ATOMIC_REQUESTS': True`
+        * 모든 쿼리가 보호되어 안전성 확보 가능
+        * 그러나 성능 저하를 발생시킬 수 있음
+        * DB가 아닌 아이템에 대해 데이터를 변형하는 뷰를 만들 때에는 해당 뷰를 `transaction.non_atomic_requests()`로 데코레이팅함을 고려
+    * 명시적인 트랜잭션 선언
+        * 성능 문제가 심각하지 않는 한 `ATOMIC_REQUESTS`를 이용
+    * 트랜잭션 가이드라인
+        * DB에 변경이 생기지 않는 작업은 트랜잭션으로 처리하지 않는다.
+        * DB에 변경이 생기는 작업은 반드시 트랜잭션으로 처리한다.
+        * DB 읽기 작업을 수반하는 변경 작업 또는 DB 성능에 관련된 특별한 경우에는 앞의 두 가이드라인을 모두 고려한다.
+| 목적 | ORM 메서드 | 트랜잭션 이용? |
+|-----|----------|-------------|
+| 데이터 생성 | .create(), .bulk_create(), .get_or_create() | Yes |
+| 데이터 가져오기 | .get(), .filter(), .count(), .iterate(), .exists(), .exclude(), .in_bulk() 등 |  |
+| 데이터 수정하기 | .update() | Yes |
+| 데이터 지우기 | .delete() | Yes |
+        * 독립적인 ORM 메서드 호출을 트랜잭션으로 처리하지 말자.
+* `django.http.StreamingHttpResponse`와 트랜잭션
+    * 뷰가 `django.http.StreamingHttpResponse`를 반환한다면 응답이 시작된 이상 트랜잭션 에러를 중간에 처리하기란 불가능
+    * `ATOMIC_REQUESTS`를 False로 설정 후, 명시적인 트랜잭션 선언을 고려
+* 참고자료
+    * [https://docs.djangoproject.com/en/1.8/topics/db/transactions](https://docs.djangoproject.com/en/1.8/topics/db/transactions)
 
