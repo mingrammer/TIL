@@ -1,5 +1,5 @@
 # wiki
-> My personal wiki
+> My personal wiki ([@mingrammer](https://github.com/mingrammer))
 
 > This wiki is published on gitbook [here](https://wiki.mingrammer.com)
 
