@@ -257,3 +257,17 @@
 * 참고자료
     * [https://docs.djangoproject.com/en/1.8/topics/db/transactions](https://docs.djangoproject.com/en/1.8/topics/db/transactions)
 
+<br>
+
+## 8. 함수 기반 뷰(FBV)와 클래스 기반 뷰(CBV)
+
+* 범용적인 CBV로 가능하거나 복잡한 뷰 처리가 필요하지 않을 경우 CBV를 사용하며, CBV를 사용했을 경우 더 복잡해지거나 커스텀 에러가 필요할 경우 FBV
+* URLConf로부터 뷰 로직 분리 (느슨한 결합 유지)
+* URL 네임스페이스 활용
+    * 서드파티 라이브러리와의 상호 운용성 증가
+    * 검색, 업그레이드, 리팩토링이 쉬움
+* URLConf에서 뷰를 문자열로 지목하지 말자. (< 1.8)
+* 뷰에서 비즈니스 로직 분리 (재사용 가능한 비즈니스 로직 컴포넌트)
+* `locals()`를 뷰 컨텍스트에 이용하지 말자.
+    * 명시적 컨텐츠를 이용
+                                                                                                                                                                                                                                                                                      
